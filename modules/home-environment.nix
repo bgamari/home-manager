@@ -340,15 +340,24 @@ in
         //
         (maybeSet "LC_TIME" cfg.language.time)
         //
-        (optionalAttrs (! config.lib.os.isNixOS) {
-          # can be removed when https://github.com/NixOS/nix/commit/b6eb8a2d7e2ea8b083fdac15f537679ffe633183
-          # gets merged into stable
-          NIX_PATH = "$HOME/.nix-defexpr/channels\${NIX_PATH:+:}$NIX_PATH";
+        (optionalAttrs (! config.lib.os.isNixOS) (
+          let
+            profiles = [ "/nix/var/nix/profiles/default" "$HOME/.nix-profile" ];
 
-          # can be removed when https://github.com/NixOS/nix/commit/7c20ee448fa924d898bcebf84bd0a7caf368a656
-          # gets merged into stable
-          NIX_PROFILES = "/nix/var/nix/profiles/default $HOME/.nix-profile";
-        });
+            dataDirs = lib.concatStringsSep ":" (map (profile: "${profile}/share") profiles);
+          in
+            {
+              # can be removed when https://github.com/NixOS/nix/commit/b6eb8a2d7e2ea8b083fdac15f537679ffe633183
+              # gets merged into stable
+              NIX_PATH = "$HOME/.nix-defexpr/channels\${NIX_PATH:+:}$NIX_PATH";
+
+              # can be removed when https://github.com/NixOS/nix/commit/7c20ee448fa924d898bcebf84bd0a7caf368a656
+              # gets merged into stable
+              NIX_PROFILES = lib.concatStringsSep " " profiles;
+
+              XDG_DATA_DIRS = "${dataDirs}\${XDG_DATA_DIRS:+:}$XDG_DATA_DIRS";
+            }
+        ));
 
     home.packages = [
       # Provide a file holding all session variables.
