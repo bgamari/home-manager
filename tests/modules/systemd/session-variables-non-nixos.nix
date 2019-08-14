@@ -4,7 +4,7 @@ with lib;
 
 {
   config = {
-    lib.os.isNixOS = true;
+    lib.os.isNixOS = false;
 
     systemd.user.sessionVariables = {
       V_int = 1;
@@ -14,7 +14,7 @@ with lib;
     nmt.script = ''
       local envFile=home-files/.config/environment.d/10-home-manager.conf
       assertFileExists $envFile
-      assertFileContent $envFile ${./session-variables-expected.conf}
+      assertFileContent $envFile ${./session-variables-non-nixos-expected.conf}
     '';
   };
 }

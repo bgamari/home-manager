@@ -263,6 +263,10 @@ in
             unset systemdStatus
           ''
       );
+
+      systemd.user.sessionVariables = mkIf (! config.lib.os.isNixOS) {
+        NIX_PATH = "$HOME/.nix-defexpr/channels\${NIX_PATH:+:}$NIX_PATH";
+      };
     })
   ];
 }
