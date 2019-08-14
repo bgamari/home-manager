@@ -4,7 +4,7 @@ with lib;
 
 {
   config = {
-    lib.os.isNixOS = true;
+    lib.os.isNixOS = false;
 
     home.sessionVariables = {
       V1 = "v1";
@@ -15,7 +15,12 @@ with lib;
       assertFileExists home-path/etc/profile.d/hm-session-vars.sh
       assertFileContent \
         home-path/etc/profile.d/hm-session-vars.sh \
-        ${./session-variables-expected.txt}
+        ${
+          pkgs.substituteAll {
+            src = ./session-variables-non-nixos-expected.txt;
+            inherit (pkgs) nix;
+          }
+        }
     '';
   };
 }

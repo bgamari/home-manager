@@ -4,6 +4,8 @@ with lib;
 
 {
   config = {
+    lib.os.isNixOS = true;
+
     programs.tmux = {
       enable = true;
       secureSocket = true;

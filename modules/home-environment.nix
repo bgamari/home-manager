@@ -338,7 +338,17 @@ in
         //
         (maybeSet "LC_PAPER" cfg.language.paper)
         //
-        (maybeSet "LC_TIME" cfg.language.time);
+        (maybeSet "LC_TIME" cfg.language.time)
+        //
+        (optionalAttrs (! config.lib.os.isNixOS) {
+          # can be removed when https://github.com/NixOS/nix/commit/b6eb8a2d7e2ea8b083fdac15f537679ffe633183
+          # gets merged into stable
+          NIX_PATH = "$HOME/.nix-defexpr/channels\${NIX_PATH:+:}$NIX_PATH";
+
+          # can be removed when https://github.com/NixOS/nix/commit/7c20ee448fa924d898bcebf84bd0a7caf368a656
+          # gets merged into stable
+          NIX_PROFILES = "/nix/var/nix/profiles/default $HOME/.nix-profile";
+        });
 
     home.packages = [
       # Provide a file holding all session variables.
@@ -350,6 +360,10 @@ in
             # Only source this once.
             if [ -n "$__HM_SESS_VARS_SOURCED" ]; then return; fi
             export __HM_SESS_VARS_SOURCED=1
+
+            ${optionalString (! config.lib.os.isNixOS) ''
+              source "${pkgs.nix}/etc/profile.d/nix.sh"
+            ''}
 
             ${config.lib.shell.exportAll cfg.sessionVariables}
           '';
