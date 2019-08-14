@@ -20,5 +20,8 @@ rec {
   types = import ./types.nix { inherit dag lib; };
 
   shell = import ./shell.nix { inherit lib; };
+
+  os = import ./os.nix;
+
   zsh = import ./zsh.nix { inherit lib; };
 }
