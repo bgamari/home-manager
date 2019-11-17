@@ -183,6 +183,11 @@ in
         fi
       '';
 
+      programs.bash.initExtra = optionalString (! config.lib.os.isNixOS) ''
+        . "${pkgs.nix}/etc/profile.d/nix.sh"
+        . "${config.home.profileDirectory}/etc/profile.d/hm-session-vars.sh"
+      '';
+
       home.file.".bash_profile".text = ''
         # -*- mode: sh -*-
 
